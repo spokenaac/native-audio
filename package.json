@@ -1,5 +1,5 @@
 {
-  "name": "@capacitor-community/native-audio",
+  "name": "spoken-native-audio",
   "version": "3.0.3",
   "description": "A native plugin for native audio engine",
   "main": "dist/plugin.js",
@@ -11,7 +11,7 @@
     "android/build.gradle",
     "dist/",
     "ios/Plugin/",
-    "CapacitorCommunityNativeAudio.podspec"
+    "SpokenNativeAudio.podspec"
   ],
   "keywords": [
     "capacitor",

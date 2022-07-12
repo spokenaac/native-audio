@@ -268,4 +268,26 @@ public class NativeAudio: CAPPlugin {
             }
         }
     }
+
+    @objc func playRaw(_ call: CAPPluginCall) {
+        let base64String = call.getString("rawAudio")
+        let audioData = Data(base64Encoded: base64String, options: .ignoreUnknownCharacters)
+        
+        if audioData != nil {
+            let filename = userDocumentsDirectory.appendingPathComponent("output.mp3")
+            do {
+                try audioData.write(to: filename, options: .atomicWrite)
+                do {
+                    audioPlayer = try AVAudioPlayer(contentsOf: filename)
+                    guard let player = audioPlayer else { return }
+                    player.prepareToPlay()
+                    player.play()
+                } catch let error {
+                    print(error.localizedDescription)
+                }
+            } catch let errorTop {
+                print(errorTop.localizedDescription)
+            }
+        }
+    }
 }

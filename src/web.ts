@@ -78,6 +78,11 @@ export class NativeAudioWeb extends WebPlugin implements NativeAudio {
     return audio.play();
   }
 
+  async playRaw(options: { rawAudio: string }): Promise<void> {
+    const audio = options.rawAudio;
+    console.log('Raw audio received: ', audio);
+  }
+
   async loop(options: { assetId: string }): Promise<void> {
     const audio: HTMLAudioElement = this.getAudioAsset(options.assetId).audio;
     await this.stop(options);
