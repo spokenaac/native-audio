@@ -270,18 +270,18 @@ public class NativeAudio: CAPPlugin {
     }
 
     @objc func playRaw(_ call: CAPPluginCall) {
-        let base64String = call.getString("rawAudio")
+        let base64String = call.getString("rawAudio") ?? ""
         let audioData = Data(base64Encoded: base64String, options: .ignoreUnknownCharacters)
         
         if audioData != nil {
-            let filename = userDocumentsDirectory.appendingPathComponent("output.mp3")
+            let documentsDirectory = getDocumentsDirectory()
+            let filename = documentsDirectory.appendingPathComponent("output.mp3")
             do {
-                try audioData.write(to: filename, options: .atomicWrite)
+                try audioData?.write(to: filename, options: .atomicWrite)
                 do {
-                    audioPlayer = try AVAudioPlayer(contentsOf: filename)
-                    guard let player = audioPlayer else { return }
-                    player.prepareToPlay()
-                    player.play()
+                    let audioPlayer = try AVAudioPlayer(contentsOf: filename)
+                    audioPlayer.prepareToPlay()
+                    audioPlayer.play()
                 } catch let error {
                     print(error.localizedDescription)
                 }
@@ -289,5 +289,11 @@ public class NativeAudio: CAPPlugin {
                 print(errorTop.localizedDescription)
             }
         }
+    }
+    
+    private func getDocumentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let documentsDirectory = paths[0]
+        return documentsDirectory
     }
 }
