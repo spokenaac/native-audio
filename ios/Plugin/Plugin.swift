@@ -3,14 +3,6 @@ import Foundation
 import Capacitor
 import CoreAudio
 
-enum MyError: Error {
-    case runtimeError(String)
-}
-
-/**
- * Please read the Capacitor iOS Plugin Development Guide
- * here: https://capacitor.ionicframework.com/docs/plugins/ios
- */
 @objc(NativeAudio)
 public class NativeAudio: CAPPlugin {
     // audio player
@@ -57,4 +49,25 @@ public class NativeAudio: CAPPlugin {
             call.reject("audioData not correct format")
         }
     }
+
+    // @objc initializePlugin(_ call: CAPPluginCall) {
+    //     let finishedPlayingNotif = NotificationCenter.default.addObserver(        
+    //         forName: NSNotification.Name.mlkitModelDownloadDidSucceed,
+    //         object: nil,
+    //         queue: OperationQueue.main,
+    //         using: {
+    //         [unowned self]
+    //         (notification) in
+    //             // access saved call from earlier when downloads were called
+    //             if let savedCall: CAPPluginCall = (bridge?.savedCall(withID: callID)) {
+    //                 let downloadedModel: DigitalInkRecognitionModel = notification.userInfo![ModelDownloadUserInfoKey.remoteModel.rawValue] as! DigitalInkRecognitionModel
+    //                 let langTag: String = downloadedModel.modelIdentifier.languageTag
+                    
+    //                 downloadCount -= 1
+                    
+    //                 savedCall.resolve(["ok": true, "done": downloadCount == 0, "msg": langTag + " model successfully downloaded."])
+    //             }
+    //         }
+    //     )
+    // }
 }

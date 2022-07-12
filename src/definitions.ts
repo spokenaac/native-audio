@@ -1,31 +1,12 @@
 export interface NativeAudio {
-  configure(options: ConfigureOptions): Promise<void>;
-  preload(options: PreloadOptions): Promise<void>;
-  play(options: { assetId: string, time: number }): Promise<void>;
-  playRaw(options: { rawAudio: string }): Promise<void>;
-  pause(options: { assetId: string }): Promise<void>;
-  resume(options: { assetId: string }): Promise<void>;
-  loop(options: { assetId: string }): Promise<void>;
-  stop(options: { assetId: string }): Promise<void>;
-  unload(options: { assetId: string }): Promise<void>;
-  setVolume(options: { assetId: string; volume: number }): Promise<void>;
-  getCurrentTime(options: {
-    assetId: string;
-  }): Promise<{ currentTime: number }>;
-  getDuration(options: { assetId: string }): Promise<{ duration: number }>;
-  isPlaying(options: {
-    assetId: string;
-  }): Promise<{ isPlaying: boolean }>;
+
+  /**
+   * Takes in a base64-encoded string, decodes, and plays the raw mp3 data via routing
+   * to device speakers
+   * @param options Object: { rawAudio: string }
+   * @param callback Callback: (success, error) => {}
+   */
+  playRaw(options: { rawAudio: string }, callback: PlayRawCallback): Promise<void>;
 }
 
-export interface ConfigureOptions {
-  fade?: boolean;
-}
-
-export interface PreloadOptions {
-  assetPath: string;
-  assetId: string;
-  volume?: number;
-  audioChannelNum?: number;
-  isUrl?: boolean;
-}
+export type PlayRawCallback = (response: Response, error?: any) => void;
