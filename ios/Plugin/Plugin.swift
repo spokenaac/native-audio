@@ -4,7 +4,7 @@ import Capacitor
 import CoreAudio
 
 @objc(NativeAudio)
-public class NativeAudio: CAPPlugin {
+public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
     // audio player
     var audioPlayer = AVAudioPlayer()
 
@@ -20,6 +20,10 @@ public class NativeAudio: CAPPlugin {
 
     // play audio from a base64-encoded string
     @objc func playRaw(_ call: CAPPluginCall) {
+        // Keep call alive until the next
+        call.keepAlive = true
+        callID = call.callbackId
+
         let base64String = call.getString("rawAudio") ?? ""
         let audioData = Data(base64Encoded: base64String)
 
@@ -31,43 +35,34 @@ public class NativeAudio: CAPPlugin {
                 try audioData?.write(to: filename, options: .atomicWrite)
                 do {
                     audioPlayer = try AVAudioPlayer(contentsOf: filename)
+                    audioPlayer.delegate = self
                     audioPlayer.prepareToPlay()
                     audioPlayer.play()
-                    call.resolve()
+                    call.resolve(["ok": true, "done": false, "msg": "Audio started"])
                 } catch let error {
-                    print("uh oh!")
                     print(error.localizedDescription)
                     call.reject(error.localizedDescription)
                 }
             } catch let errorTop {
-                print("")
                 print(errorTop.localizedDescription)
                 call.reject(errorTop.localizedDescription)
             }
         }
         else {
-            call.reject("audioData not correct format")
+            call.reject("audioData not in correct format")
         }
     }
+    
+    public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        if let savedCall: CAPPluginCall = (bridge?.savedCall(withID: callID)) {
+            savedCall.keepAlive = false
 
-    // @objc initializePlugin(_ call: CAPPluginCall) {
-    //     let finishedPlayingNotif = NotificationCenter.default.addObserver(        
-    //         forName: NSNotification.Name.mlkitModelDownloadDidSucceed,
-    //         object: nil,
-    //         queue: OperationQueue.main,
-    //         using: {
-    //         [unowned self]
-    //         (notification) in
-    //             // access saved call from earlier when downloads were called
-    //             if let savedCall: CAPPluginCall = (bridge?.savedCall(withID: callID)) {
-    //                 let downloadedModel: DigitalInkRecognitionModel = notification.userInfo![ModelDownloadUserInfoKey.remoteModel.rawValue] as! DigitalInkRecognitionModel
-    //                 let langTag: String = downloadedModel.modelIdentifier.languageTag
-                    
-    //                 downloadCount -= 1
-                    
-    //                 savedCall.resolve(["ok": true, "done": downloadCount == 0, "msg": langTag + " model successfully downloaded."])
-    //             }
-    //         }
-    //     )
-    // }
+            if flag {
+                savedCall.resolve(["ok": true, "done": true, "msg": "Finished playing audio."])
+                return
+            }
+
+            savedCall.reject("Some error in finishing playing audio")
+        }
+    }
 }

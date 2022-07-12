@@ -208,199 +208,28 @@ NativeAudio.isPlaying({
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### configure(...)
-
-```typescript
-configure(options: ConfigureOptions) => Promise<void>
-```
-
-| Param         | Type                                                          |
-| ------------- | ------------------------------------------------------------- |
-| **`options`** | <code><a href="#configureoptions">ConfigureOptions</a></code> |
-
---------------------
-
-
-### preload(...)
-
-```typescript
-preload(options: PreloadOptions) => Promise<void>
-```
-
-| Param         | Type                                                      |
-| ------------- | --------------------------------------------------------- |
-| **`options`** | <code><a href="#preloadoptions">PreloadOptions</a></code> |
-
---------------------
-
-
-### play(...)
-
-```typescript
-play(options: { assetId: string; time: number; }) => Promise<void>
-```
-
-| Param         | Type                                            |
-| ------------- | ----------------------------------------------- |
-| **`options`** | <code>{ assetId: string; time: number; }</code> |
-
---------------------
-
-
 ### playRaw(...)
 
 ```typescript
-playRaw(options: { rawAudio: string; }) => Promise<void>
+playRaw(options: { rawAudio: string; }, callback: PlayRawCallback) => Promise<void>
 ```
 
-| Param         | Type                               |
-| ------------- | ---------------------------------- |
-| **`options`** | <code>{ rawAudio: string; }</code> |
+Takes in a base64-encoded string, decodes, and plays the raw mp3 data via routing
+to device speakers
+
+| Param          | Type                                                        | Description                         |
+| -------------- | ----------------------------------------------------------- | ----------------------------------- |
+| **`options`**  | <code>{ rawAudio: string; }</code>                          | Object: { rawAudio: string }        |
+| **`callback`** | <code><a href="#playrawcallback">PlayRawCallback</a></code> | Callback: (success, error) =&gt; {} |
 
 --------------------
 
 
-### pause(...)
-
-```typescript
-pause(options: { assetId: string; }) => Promise<void>
-```
-
-| Param         | Type                              |
-| ------------- | --------------------------------- |
-| **`options`** | <code>{ assetId: string; }</code> |
-
---------------------
+### Type Aliases
 
 
-### resume(...)
+#### PlayRawCallback
 
-```typescript
-resume(options: { assetId: string; }) => Promise<void>
-```
-
-| Param         | Type                              |
-| ------------- | --------------------------------- |
-| **`options`** | <code>{ assetId: string; }</code> |
-
---------------------
-
-
-### loop(...)
-
-```typescript
-loop(options: { assetId: string; }) => Promise<void>
-```
-
-| Param         | Type                              |
-| ------------- | --------------------------------- |
-| **`options`** | <code>{ assetId: string; }</code> |
-
---------------------
-
-
-### stop(...)
-
-```typescript
-stop(options: { assetId: string; }) => Promise<void>
-```
-
-| Param         | Type                              |
-| ------------- | --------------------------------- |
-| **`options`** | <code>{ assetId: string; }</code> |
-
---------------------
-
-
-### unload(...)
-
-```typescript
-unload(options: { assetId: string; }) => Promise<void>
-```
-
-| Param         | Type                              |
-| ------------- | --------------------------------- |
-| **`options`** | <code>{ assetId: string; }</code> |
-
---------------------
-
-
-### setVolume(...)
-
-```typescript
-setVolume(options: { assetId: string; volume: number; }) => Promise<void>
-```
-
-| Param         | Type                                              |
-| ------------- | ------------------------------------------------- |
-| **`options`** | <code>{ assetId: string; volume: number; }</code> |
-
---------------------
-
-
-### getCurrentTime(...)
-
-```typescript
-getCurrentTime(options: { assetId: string; }) => Promise<{ currentTime: number; }>
-```
-
-| Param         | Type                              |
-| ------------- | --------------------------------- |
-| **`options`** | <code>{ assetId: string; }</code> |
-
-**Returns:** <code>Promise&lt;{ currentTime: number; }&gt;</code>
-
---------------------
-
-
-### getDuration(...)
-
-```typescript
-getDuration(options: { assetId: string; }) => Promise<{ duration: number; }>
-```
-
-| Param         | Type                              |
-| ------------- | --------------------------------- |
-| **`options`** | <code>{ assetId: string; }</code> |
-
-**Returns:** <code>Promise&lt;{ duration: number; }&gt;</code>
-
---------------------
-
-
-### isPlaying(...)
-
-```typescript
-isPlaying(options: { assetId: string; }) => Promise<{ isPlaying: boolean; }>
-```
-
-| Param         | Type                              |
-| ------------- | --------------------------------- |
-| **`options`** | <code>{ assetId: string; }</code> |
-
-**Returns:** <code>Promise&lt;{ isPlaying: boolean; }&gt;</code>
-
---------------------
-
-
-### Interfaces
-
-
-#### ConfigureOptions
-
-| Prop       | Type                 |
-| ---------- | -------------------- |
-| **`fade`** | <code>boolean</code> |
-
-
-#### PreloadOptions
-
-| Prop                  | Type                 |
-| --------------------- | -------------------- |
-| **`assetPath`**       | <code>string</code>  |
-| **`assetId`**         | <code>string</code>  |
-| **`volume`**          | <code>number</code>  |
-| **`audioChannelNum`** | <code>number</code>  |
-| **`isUrl`**           | <code>boolean</code> |
+<code>(response: any, error?: any): void</code>
 
 </docgen-api>
