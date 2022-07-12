@@ -247,6 +247,19 @@ play(options: { assetId: string; time: number; }) => Promise<void>
 --------------------
 
 
+### playRaw(...)
+
+```typescript
+playRaw(options: { rawAudio: string; }) => Promise<void>
+```
+
+| Param         | Type                               |
+| ------------- | ---------------------------------- |
+| **`options`** | <code>{ rawAudio: string; }</code> |
+
+--------------------
+
+
 ### pause(...)
 
 ```typescript
