@@ -225,11 +225,23 @@ to device speakers
 --------------------
 
 
+### Interfaces
+
+
+#### Response
+
+| Prop       | Type                 |
+| ---------- | -------------------- |
+| **`ok`**   | <code>boolean</code> |
+| **`done`** | <code>boolean</code> |
+| **`msg`**  | <code>string</code>  |
+
+
 ### Type Aliases
 
 
 #### PlayRawCallback
 
-<code>(response: any, error?: any): void</code>
+<code>(response: <a href="#response">Response</a>, error?: any): void</code>
 
 </docgen-api>
