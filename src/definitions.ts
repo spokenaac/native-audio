@@ -9,4 +9,10 @@ export interface NativeAudio {
   playRaw(options: { rawAudio: string }, callback: PlayRawCallback): Promise<void>;
 }
 
+export interface Response {
+  ok: boolean,
+  done: boolean,
+  msg: string
+}
+
 export type PlayRawCallback = (response: Response, error?: any) => void;
