@@ -39,51 +39,72 @@ public class NativeAudio
   extends Plugin {
 
   public static final String TAG = "NativeAudio";
+  MediaPlayer mediaPlayer = null;
 
   @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
   public void playRaw(PluginCall call) {
-//    call.setKeepAlive(true);
+    call.setKeepAlive(true);
     JSObject res = new JSObject();
 
     String base64String = call.getString("rawAudio");
 
     try{
       String url = "data:audio/mp3;base64," + base64String;
-      MediaPlayer mediaPlayer = new MediaPlayer();
+      if (mediaPlayer == null) {
+          mediaPlayer = new MediaPlayer();
+      }
 
       try {
         mediaPlayer.setDataSource(url);
-        mediaPlayer.prepareAsync();
+        mediaPlayer.prepare();
         mediaPlayer.setVolume(100f, 100f);
         mediaPlayer.setLooping(false);
-      } catch (IllegalArgumentException e) {
-        System.out.println("You might not set the DataSource correctly!");
-        e.printStackTrace()
-      } catch (SecurityException e) {
-        System.out.println("You might not set the DataSource correctly!");
-        e.printStackTrace()
-      } catch (IllegalStateException e) {
-        System.out.println("You might not set the DataSource correctly!");      } catch (IOException e) {
-        e.printStackTrace();
+      } catch (Exception e) {
+          System.out.println("\nException!!");
+          System.out.println(e.getMessage());
+          call.setKeepAlive(false);
+          call.reject(e.getMessage());
+          e.printStackTrace();
       }
 
       mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
           @Override
           public void onPrepared(MediaPlayer player) {
               player.start();
+              res.put("msg", "Audio started");
+              res.put("ok", true);
+              res.put("done", false);
           }
       });
 
       mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
           @Override
           public void onCompletion(MediaPlayer mp) {
-              mp.stop();
-              mp.release();
+              call.setKeepAlive(false);
+
+              if (mp.isPlaying()) {
+                  mp.stop();
+              }
+              mp.reset();
+
+              res.put("msg", "Audio finished playing");
+              res.put("ok", true);
+              res.put("done", true);
+              call.resolve(res);
           }
       });
     }
     catch(Exception e){
+        System.out.println("\nException!!");
+        System.out.println(e.getMessage());
+        call.setKeepAlive(false);
+        call.reject(e.getMessage());
         e.printStackTrace();
     }
+  }
+
+  @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
+  public void stop(PluginCall call) {
+    return
   }
 }

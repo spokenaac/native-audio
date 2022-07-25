@@ -1,5 +1,5 @@
 import { WebPlugin } from '@capacitor/core';
-import { NativeAudio, PlayRawCallback } from './definitions';
+import { NativeAudio, PlayRawCallback, Response } from './definitions';
 
 export class NativeAudioWeb extends WebPlugin implements NativeAudio {
   constructor() {
@@ -12,6 +12,16 @@ export class NativeAudioWeb extends WebPlugin implements NativeAudio {
   async playRaw(options: { rawAudio: string }, callback: PlayRawCallback): Promise<void> {
     const audio = options.rawAudio;
     console.log('Raw audio received: ', audio, callback);
+  }
+
+  async stop(): Promise<Response> {
+    console.log('Stopping audio...');
+
+    return {
+      msg: "Stopped",
+      ok: true,
+      done: true
+    }
   }
 }
 

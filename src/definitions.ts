@@ -7,6 +7,11 @@ export interface NativeAudio {
    * @param callback Callback: (success, error) => {}
    */
   playRaw(options: { rawAudio: string }, callback: PlayRawCallback): Promise<void>;
+
+  /**
+   * Immediately stops all audio being played.
+   */
+  stop(): Promise<Response>;
 }
 
 export interface Response {

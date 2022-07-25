@@ -65,4 +65,8 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
             savedCall.reject("Some error in finishing playing audio")
         }
     }
+
+    @objc func stop(_ call: CAPPluginCall) {
+        return
+    }
 }
