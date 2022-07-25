@@ -67,6 +67,6 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
     }
 
     @objc func stop(_ call: CAPPluginCall) {
-        return
+        call.resolve(["msg": "iOS organically stops audio -- this method not implemented in iOS.", "ok": true, "done": true])
     }
 }

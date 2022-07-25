@@ -103,8 +103,28 @@ public class NativeAudio
     }
   }
 
-  @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
+  @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
   public void stop(PluginCall call) {
-    return
+      JSObject res = new JSObject();
+
+      if (mediaPlayer == null) {
+          res.put("msg", "Audio hasn't started playing yet.");
+          res.put("ok", true);
+          res.put("done", true);
+          call.resolve(res);
+      }
+
+      try {
+          mediaPlayer.stop();
+          mediaPlayer.reset();
+
+          res.put("msg", "Audio stopped");
+          res.put("ok", true);
+          res.put("done", true);
+          call.resolve(res);
+      } catch (Exception e) {
+          System.out.println("\n\nException stopping audio: " + e.getMessage());
+          call.reject(e.getMessage());
+      }
   }
 }

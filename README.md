@@ -225,6 +225,19 @@ to device speakers
 --------------------
 
 
+### stop()
+
+```typescript
+stop() => Promise<Response>
+```
+
+Immediately stops all audio being played.
+
+**Returns:** <code>Promise&lt;<a href="#response">Response</a>&gt;</code>
+
+--------------------
+
+
 ### Interfaces
 
 

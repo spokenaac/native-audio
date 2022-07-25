@@ -12,6 +12,8 @@ export interface NativeAudio {
    * Immediately stops all audio being played.
    */
   stop(): Promise<Response>;
+
+  audioElement: HTMLAudioElement | null
 }
 
 export interface Response {
