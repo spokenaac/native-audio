@@ -10,12 +10,19 @@ export class NativeAudioWeb extends WebPlugin implements NativeAudio {
       platforms: ['web'],
     });
 
-    // Add audio node to html on plugin instantiation
-    const elementId = "audioElement" + new Date().valueOf().toString();
-    const audioElement = document.createElement('audio');
-    audioElement.setAttribute("id", elementId);
-    document.body.appendChild(audioElement);
-    this.audioElement = audioElement;
+    const audioElementsOnPage = document.querySelectorAll('audio');
+
+    if (audioElementsOnPage.length > 0) {
+      this.audioElement = audioElementsOnPage[0];
+    }
+    else {
+      // Add audio node to html on plugin instantiation
+      const elementId = "audioElement" + new Date().valueOf().toString();
+      const audioElement = document.createElement('audio');
+      audioElement.setAttribute("id", elementId);
+      document.body.appendChild(audioElement);
+      this.audioElement = audioElement;
+    }
   }
 
   async playRaw(options: { rawAudio: string }, callback: PlayRawCallback): Promise<void> {
@@ -29,7 +36,7 @@ export class NativeAudioWeb extends WebPlugin implements NativeAudio {
       });
 
       // set the src to our decoded base64 data and play it
-      this.audioElement.src = `data:audio/mpeg;base64,${btoa(options.rawAudio)}`;
+      this.audioElement.src = "data:audio/mpeg;base64," + btoa(options.rawAudio);
       await this.audioElement.play();
 
       // play() promise resolves when playing has begun
