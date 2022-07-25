@@ -36,7 +36,7 @@ export class NativeAudioWeb extends WebPlugin implements NativeAudio {
       });
 
       // set the src to our decoded base64 data and play it
-      this.audioElement.src = "data:audio/mpeg;base64," + btoa(options.rawAudio);
+      this.audioElement.src = "data:audio/mpeg;base64," + options.rawAudio;
       await this.audioElement.play();
 
       // play() promise resolves when playing has begun
