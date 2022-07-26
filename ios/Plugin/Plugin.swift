@@ -20,6 +20,8 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
 
     // play audio from a base64-encoded string
     @objc func playRaw(_ call: CAPPluginCall) {
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
+
         // Keep call alive until the next
         call.keepAlive = true
         callID = call.callbackId
