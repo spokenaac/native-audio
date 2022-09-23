@@ -7,6 +7,8 @@ import CoreAudio
 public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
     // audio player
     var audioPlayer = AVAudioPlayer()
+    var sharedInstance: AVAudioSession = AVAudioSession()
+    var isBluetooth = false
 
     // save callID to access saved calls for later
     var callID: String = ""
@@ -20,7 +22,10 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
 
     // play audio from a base64-encoded string
     @objc func playRaw(_ call: CAPPluginCall) {
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])
+        // set sharedInstance to current one
+        sharedInstance = AVAudioSession.sharedInstance()
+        
+        try? sharedInstance.setCategory(.playback, mode: .default, options: [])
 
         // Keep call alive until the next
         call.keepAlive = true
@@ -28,6 +33,26 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
 
         let base64String = call.getString("rawAudio") ?? ""
         let audioData = Data(base64Encoded: base64String)
+
+        let bluetoothBuffer = call.getDouble("bluetoothBuffer") ?? 0
+        let bluetoothKeepAlive = call.getDouble("bluetoothKeepAlive") ?? 0
+        
+        let currentRoute: AVAudioSessionRouteDescription = sharedInstance.currentRoute
+        
+        for output in currentRoute.outputs {
+            if output.portType.rawValue.contains("Bluetooth") {
+                isBluetooth = true
+                break
+            }
+        }
+        
+        if isBluetooth {
+            print("NativeAudio: Detected bluetooth speaker, adding provided delay of: ", bluetoothBuffer, " ms")
+            print("NativeAudio: Using bluetooth keepalive value of: ", bluetoothKeepAlive, " ms")
+        }
+        else {
+            print("NativeAudio: No bluetooth detected, routing audio to device speakers or other local connection.")
+        }
 
         if audioData != nil {
             let documentsDirectory = getDocumentsDirectory()
@@ -39,7 +64,14 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
                     audioPlayer = try AVAudioPlayer(contentsOf: filename)
                     audioPlayer.delegate = self
                     audioPlayer.prepareToPlay()
-                    audioPlayer.play()
+
+                    if (isBluetooth) {
+                        audioPlayer.play(atTime: audioPlayer.deviceCurrentTime + (bluetoothBuffer / 1000.0))
+                    }
+                    else {
+                        audioPlayer.play()
+                    }
+
                     call.resolve(["ok": true, "done": false, "msg": "Audio started"])
                 } catch let error {
                     print(error.localizedDescription)

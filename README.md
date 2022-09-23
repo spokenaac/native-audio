@@ -211,16 +211,32 @@ NativeAudio.isPlaying({
 ### playRaw(...)
 
 ```typescript
-playRaw(options: { rawAudio: string; }, callback: PlayRawCallback) => Promise<void>
+playRaw(options: PlayRawOptions, callback: PlayRawCallback) => Promise<void>
 ```
 
 Takes in a base64-encoded string, decodes, and plays the raw mp3 data via routing
 to device speakers
 
-| Param          | Type                                                        | Description                         |
-| -------------- | ----------------------------------------------------------- | ----------------------------------- |
-| **`options`**  | <code>{ rawAudio: string; }</code>                          | Object: { rawAudio: string }        |
-| **`callback`** | <code><a href="#playrawcallback">PlayRawCallback</a></code> | Callback: (success, error) =&gt; {} |
+| Param          | Type                                                        | Description                                                                       |
+| -------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| **`options`**  | <code><a href="#playrawoptions">PlayRawOptions</a></code>   | Object: { rawAudio: string, bluetoothBuffer: number, bluetoothKeepAlive: number } |
+| **`callback`** | <code><a href="#playrawcallback">PlayRawCallback</a></code> | Callback: (success, error) =&gt; {}                                               |
+
+--------------------
+
+
+### calibrateBluetooth(...)
+
+```typescript
+calibrateBluetooth(options: CalibrationOptions, callback: PlayRawCallback) => Promise<void>
+```
+
+Used to calibrate the bluetooth buffer offset
+
+| Param          | Type                                                              |
+| -------------- | ----------------------------------------------------------------- |
+| **`options`**  | <code><a href="#calibrationoptions">CalibrationOptions</a></code> |
+| **`callback`** | <code><a href="#playrawcallback">PlayRawCallback</a></code>       |
 
 --------------------
 
@@ -241,6 +257,15 @@ Immediately stops all audio being played.
 ### Interfaces
 
 
+#### PlayRawOptions
+
+| Prop                     | Type                |
+| ------------------------ | ------------------- |
+| **`rawAudio`**           | <code>string</code> |
+| **`bluetoothBuffer`**    | <code>number</code> |
+| **`bluetoothKeepAlive`** | <code>number</code> |
+
+
 #### Response
 
 | Prop       | Type                 |
@@ -248,6 +273,13 @@ Immediately stops all audio being played.
 | **`ok`**   | <code>boolean</code> |
 | **`done`** | <code>boolean</code> |
 | **`msg`**  | <code>string</code>  |
+
+
+#### CalibrationOptions
+
+| Prop                  | Type                |
+| --------------------- | ------------------- |
+| **`bluetoothOffset`** | <code>number</code> |
 
 
 ### Type Aliases

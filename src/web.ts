@@ -1,5 +1,5 @@
 import { WebPlugin } from '@capacitor/core';
-import { NativeAudio, PlayRawCallback, Response } from './definitions';
+import { CalibrationOptions, NativeAudio, PlayRawCallback, PlayRawOptions, Response } from './definitions';
 
 export class NativeAudioWeb extends WebPlugin implements NativeAudio {
   audioElement: HTMLAudioElement | null;
@@ -25,7 +25,12 @@ export class NativeAudioWeb extends WebPlugin implements NativeAudio {
     }
   }
 
-  async playRaw(options: { rawAudio: string }, callback: PlayRawCallback): Promise<void> {
+  async playRaw(options: PlayRawOptions, callback: PlayRawCallback): Promise<void> {
+    /**
+     * 
+     * TODO: Implement bluetooth checking + delay for web
+     * 
+     */
     // if we have a viable audioElement on the class
     if (this.audioElement) {
       // notify user that we're queuing up the audio
@@ -55,6 +60,10 @@ export class NativeAudioWeb extends WebPlugin implements NativeAudio {
         })
       }
     }
+  }
+
+  async calibrateBluetooth(options: CalibrationOptions, callback: PlayRawCallback): Promise<void> {
+    console.log(options, callback);
   }
 
   async stop(): Promise<Response> {
