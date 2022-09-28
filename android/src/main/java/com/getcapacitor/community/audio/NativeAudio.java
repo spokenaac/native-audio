@@ -16,8 +16,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 @CapacitorPlugin(
   permissions = {
@@ -28,161 +26,73 @@ import java.util.TimerTask;
 )
 public class NativeAudio extends Plugin {
 
-    public static final String TAG = "NativeAudio";
+    // instantiate our class-level media player
     MediaPlayer mediaPlayer = null;
 
+    // class-level flag for if we're using a bluetooth offset or not
+    Boolean currentlyPlayingBluetoothBuffer = false;
+
+    /**
+     * Gets offset base64 txt if provided, if not, gets base64 string from call
+     * Prepares mediaPlayer for playback
+     * Once prepared, either:
+     *      A) bluetoothBuffer base64 white noise is played
+     *      B) base64 from call is played
+     * If bluetoothBuffer was played, the onCompletion listener will trigger the preparation
+     *      of the next audio (call base64), and the loop runs one more time
+     * Call resolves
+     * */
     @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
     public void playRaw(PluginCall call) {
+        // this is a callback hook, keep the call alive until we manually finish it
         call.setKeepAlive(true);
-        JSObject res = new JSObject();
 
-        String base64String = call.getString("rawAudio");
+        // get our offset
+        Integer bluetoothBuffer = call.getInt("bluetoothBuffer");
 
-        try {
-          String url = "data:audio/mp3;base64," + base64String;
-          if (mediaPlayer == null) {
-              mediaPlayer = new MediaPlayer();
-          }
+        String base64String = "";
 
-          try {
-            mediaPlayer.setDataSource(url);
-            mediaPlayer.prepare();
-            mediaPlayer.setVolume(100f, 100f);
-            mediaPlayer.setLooping(false);
-          } catch (Exception e) {
-              System.out.println("\nException!!");
-              System.out.println(e.getMessage());
-              call.setKeepAlive(false);
-              call.reject(e.getMessage());
-              e.printStackTrace();
-          }
-
-          mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-              @Override
-              public void onPrepared(MediaPlayer player) {
-                  player.start();
-                  res.put("msg", "Audio started");
-                  res.put("ok", true);
-                  res.put("done", false);
-              }
-          });
-
-          mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-              @Override
-              public void onCompletion(MediaPlayer mp) {
-                  call.setKeepAlive(false);
-
-                  if (mp.isPlaying()) {
-                      mp.stop();
-                  }
-                  mp.reset();
-                  mp = null;
-                  mediaPlayer = null;
-
-                  res.put("msg", "Audio finished playing");
-                  res.put("ok", true);
-                  res.put("done", true);
-                  call.resolve(res);
-              }
-          });
+        if (bluetoothBuffer >= 25) {
+            // we're doing the bluetooth offset first, get it and not the txt-to-speech string
+            currentlyPlayingBluetoothBuffer = true;
+            Integer safeBluetoothBuffer = bluetoothBuffer - (bluetoothBuffer % 25);
+            base64String = getAssets(bluetoothBuffer);
         }
-        catch(Exception e){
-            System.out.println("\nException!!");
-            System.out.println(e.getMessage());
-            call.setKeepAlive(false);
-            call.reject(e.getMessage());
-            e.printStackTrace();
+        else {
+            // get the txt-to-speech base64 string
+            base64String = call.getString("rawAudio");
         }
-      }
 
-    @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
-    public void calibrateBluetooth(PluginCall call) {
-        call.setKeepAlive(true);
-        JSObject res = new JSObject();
-
-        Integer bluetoothOffset = call.getInt("bluetoothOffset");
-
-        String base64String = getAssets(bluetoothOffset);
-
-        try {
-            String url = "data:audio/mp3;base64," + base64String;
-            if (mediaPlayer == null) {
-                mediaPlayer = new MediaPlayer();
-            }
-
-            try {
-                mediaPlayer.setDataSource(url);
-                mediaPlayer.prepare();
-                mediaPlayer.setVolume(100f, 100f);
-                mediaPlayer.setLooping(false);
-            } catch (Exception e) {
-                call.setKeepAlive(false);
-                call.reject(e.getMessage());
-                e.printStackTrace();
-            }
-
-            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer player) {
-                    player.start();
-
-                    res.put("msg", "Audio started");
-                    res.put("ok", true);
-                    res.put("done", false);
-                }
-            });
-
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    call.setKeepAlive(false);
-
-                    if (mp.isPlaying()) {
-                        mp.stop();
-                    }
-                    mp.reset();
-                    mp = null;
-                    mediaPlayer = null;
-
-                    res.put("msg", "Audio finished playing");
-                    res.put("ok", true);
-                    res.put("done", true);
-                    call.resolve(res);
-                }
-            });
-        }
-        catch(Exception e){
-            System.out.println("\nException!!");
-            System.out.println(e.getMessage());
-            call.setKeepAlive(false);
-            call.reject(e.getMessage());
-            e.printStackTrace();
-        }
+        // This fires mediaPlayer.prepare(), so next code to execute should be onPrepared listener
+        prepMediaPlayer(base64String, call);
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     public void stop(PluginCall call) {
-      JSObject res = new JSObject();
+        JSObject res = new JSObject();
 
-      if (mediaPlayer == null) {
-          res.put("msg", "Audio hasn't started playing yet.");
-          res.put("ok", true);
-          res.put("done", true);
-          call.resolve(res);
-      }
+        if (mediaPlayer == null) {
+            res.put("msg", "Audio hasn't started playing yet.");
+            res.put("ok", true);
+            res.put("done", true);
+            call.resolve(res);
 
-      try {
-          mediaPlayer.stop();
-          mediaPlayer.reset();
+            return;
+        }
 
-          res.put("msg", "Audio stopped");
-          res.put("ok", true);
-          res.put("done", true);
-          call.resolve(res);
-      } catch (Exception e) {
-          System.out.println("Exception stopping audio: " + e.getMessage());
-          call.reject(e.getMessage());
-      }
+        try {
+            mediaPlayer.stop();
+            mediaPlayer.reset();
+            mediaPlayer = null;
+
+            res.put("msg", "Audio stopped");
+            res.put("ok", true);
+            res.put("done", true);
+            call.resolve(res);
+        } catch (Exception e) {
+            System.out.println("Exception stopping audio: " + e.getMessage());
+            call.reject(e.getMessage());
+        }
     }
 
     public String getAssets(int filepath) {
@@ -190,7 +100,7 @@ public class NativeAudio extends Plugin {
         try {
             String filename = filepath + ".txt";
             InputStream file = assetManager.open(filename);
-            String result = isToString(file);
+            String result = streamToString(file);
             return result;
         }
         catch (IOException err) {
@@ -200,7 +110,7 @@ public class NativeAudio extends Plugin {
         return "";
     }
 
-    public String isToString(InputStream is) {
+    public String streamToString(InputStream is) {
         final int bufferSize = 1024;
         final char[] buffer = new char[bufferSize];
         final StringBuilder out = new StringBuilder();
@@ -225,5 +135,95 @@ public class NativeAudio extends Plugin {
         }
 
         return "";
+    }
+
+    public void prepMediaPlayer(String base64, PluginCall call) {
+        if (mediaPlayer == null) {
+            mediaPlayer = new MediaPlayer();
+        }
+
+        // just like in js/html!
+        String url = "data:audio/mp3;base64," + base64;
+
+        // set source, prepare, ensure volume and looping are appropriate
+        // once .prepare() is called, we then wait until onPrepared() listener is fired.
+        try {
+            mediaPlayer.setDataSource(url);
+            mediaPlayer.prepare();
+            mediaPlayer.setVolume(100f, 100f);
+            mediaPlayer.setLooping(false);
+        }
+        catch (Exception e) {
+            System.out.println("\nException!!");
+            System.out.println(e.getMessage());
+            call.setKeepAlive(false);
+            call.reject(e.getMessage());
+            e.printStackTrace();
+        }
+
+        try {
+            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer player) {
+                    JSObject res = new JSObject();
+                    // mediaPlayer is ready to go, play the audio
+                    // next, waiting for onCompletionListener to fire.
+                    player.start();
+
+                    // let the client know we've started audio
+                    res.put("msg", "Audio started");
+                    res.put("ok", true);
+                    res.put("done", false);
+                    call.resolve(res);
+                }
+            });
+
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    JSObject res = new JSObject();
+
+                    if (mp.isPlaying()) {
+                        mp.stop();
+                    }
+
+                    // reset our player
+                    mp.reset();
+                    mediaPlayer = null;
+
+                    if (currentlyPlayingBluetoothBuffer) {
+                        // bluetooth offset just completed
+                        // prepare again but this time use the txt-to-speech base64
+                        String txtToSpeechB64 = call.getString("rawAudio");
+                        prepMediaPlayer(txtToSpeechB64, call);
+
+                        // flip the flag
+                        currentlyPlayingBluetoothBuffer = false;
+
+                        res.put("msg", "Bluetooth offset finished, starting txt to speech...");
+                        res.put("ok", true);
+                        res.put("done", false);
+                    }
+                    else {
+                        // this is the last audio track we need to play
+                        call.setKeepAlive(false);
+
+                        res.put("msg", "Audio finished playing");
+                        res.put("ok", true);
+                        res.put("done", true);
+                    }
+
+                    // inform client of our status
+                    call.resolve(res);
+                }
+            });
+        }
+        catch(Exception e){
+            System.out.println("\nException!!");
+            System.out.println(e.getMessage());
+            call.setKeepAlive(false);
+            call.reject(e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

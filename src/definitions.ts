@@ -9,13 +9,6 @@ export interface NativeAudio {
   playRaw(options: PlayRawOptions, callback: PlayRawCallback): Promise<void>;
 
   /**
-   * Used to calibrate the bluetooth buffer offset
-   * @param options 
-   * @param callback 
-   */
-  calibrateBluetooth(options: CalibrationOptions, callback: PlayRawCallback): Promise<void>;
-
-  /**
    * Immediately stops all audio being played.
    */
   stop(): Promise<Response>;
@@ -35,7 +28,7 @@ export interface CalibrationOptions {
 
 export interface PlayRawOptions {
   rawAudio: string,
-  bluetoothBuffer?: number,
+  bluetoothBuffer: number,
   bluetoothKeepAlive?: number
 }
 

@@ -225,22 +225,6 @@ to device speakers
 --------------------
 
 
-### calibrateBluetooth(...)
-
-```typescript
-calibrateBluetooth(options: CalibrationOptions, callback: PlayRawCallback) => Promise<void>
-```
-
-Used to calibrate the bluetooth buffer offset
-
-| Param          | Type                                                              |
-| -------------- | ----------------------------------------------------------------- |
-| **`options`**  | <code><a href="#calibrationoptions">CalibrationOptions</a></code> |
-| **`callback`** | <code><a href="#playrawcallback">PlayRawCallback</a></code>       |
-
---------------------
-
-
 ### stop()
 
 ```typescript
@@ -273,13 +257,6 @@ Immediately stops all audio being played.
 | **`ok`**   | <code>boolean</code> |
 | **`done`** | <code>boolean</code> |
 | **`msg`**  | <code>string</code>  |
-
-
-#### CalibrationOptions
-
-| Prop                  | Type                |
-| --------------------- | ------------------- |
-| **`bluetoothOffset`** | <code>number</code> |
 
 
 ### Type Aliases
