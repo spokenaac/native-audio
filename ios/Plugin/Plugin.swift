@@ -8,7 +8,6 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
     // audio player
     var audioPlayer = AVAudioPlayer()
     var sharedInstance: AVAudioSession = AVAudioSession()
-    var isBluetooth = false
 
     // save callID to access saved calls for later
     var callID: String = ""
@@ -36,23 +35,6 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
 
         let bluetoothBuffer = call.getDouble("bluetoothBuffer") ?? 0
         let bluetoothKeepAlive = call.getDouble("bluetoothKeepAlive") ?? 0
-        
-        let currentRoute: AVAudioSessionRouteDescription = sharedInstance.currentRoute
-        
-        for output in currentRoute.outputs {
-            if output.portType.rawValue.contains("Bluetooth") {
-                isBluetooth = true
-                break
-            }
-        }
-        
-        if isBluetooth {
-            print("NativeAudio: Detected bluetooth speaker, adding provided delay of: ", bluetoothBuffer, " ms")
-            print("NativeAudio: Using bluetooth keepalive value of: ", bluetoothKeepAlive, " ms")
-        }
-        else {
-            print("NativeAudio: No bluetooth detected, routing audio to device speakers or other local connection.")
-        }
 
         if audioData != nil {
             let documentsDirectory = getDocumentsDirectory()
@@ -64,13 +46,7 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
                     audioPlayer = try AVAudioPlayer(contentsOf: filename)
                     audioPlayer.delegate = self
                     audioPlayer.prepareToPlay()
-
-                    if (isBluetooth) {
-                        audioPlayer.play(atTime: audioPlayer.deviceCurrentTime + (bluetoothBuffer / 1000.0))
-                    }
-                    else {
-                        audioPlayer.play()
-                    }
+                    audioPlayer.play(atTime: audioPlayer.deviceCurrentTime + (bluetoothBuffer / 1000.0))
 
                     call.resolve(["ok": true, "done": false, "msg": "Audio started"])
                 } catch let error {
