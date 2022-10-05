@@ -238,6 +238,17 @@ Immediately stops all audio being played.
 --------------------
 
 
+### bingbong()
+
+```typescript
+bingbong() => Promise<void>
+```
+
+If you see these dogs in your front yard, just know upstairs I'm going hard. BING BONG.
+
+--------------------
+
+
 ### Interfaces
 
 

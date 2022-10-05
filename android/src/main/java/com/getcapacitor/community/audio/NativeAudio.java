@@ -67,6 +67,10 @@ public class NativeAudio extends Plugin {
         prepMediaPlayer(base64String, call);
     }
 
+    /**
+     * Stops all audio
+     * @param call
+     */
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     public void stop(PluginCall call) {
         JSObject res = new JSObject();
@@ -95,6 +99,53 @@ public class NativeAudio extends Plugin {
         }
     }
 
+    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+    public void bingbong(PluginCall call) {
+        AssetManager assetManager = getContext().getAssets();
+        try {
+            String filename = "bingbong.txt";
+            InputStream file = assetManager.open(filename);
+
+            final int bufferSize = 1024;
+            final char[] buffer = new char[bufferSize];
+            final StringBuilder out = new StringBuilder();
+
+            try {
+                Reader in = new InputStreamReader(file, "UTF-8");
+                for (; ; ) {
+                    int rsz = in.read(buffer, 0, buffer.length);
+                    if (rsz < 0)
+                        break;
+                    out.append(buffer, 0, rsz);
+                }
+
+                String result = out.toString();
+
+                prepMediaPlayer(result, call);
+
+                JSObject bong = new JSObject();
+                bong.put("ok", true);
+                bong.put("done", true);
+                bong.put("msg", "bingbong");
+            }
+            catch(UnsupportedEncodingException err) {
+                System.out.println(err);
+            }
+
+            catch(IOException err) {
+                System.out.println(err);
+            }
+        }
+        catch (IOException err) {
+            System.out.println(err);
+        }
+    }
+
+    /**
+     * Gets input stream
+     * @param filepath
+     * @return
+     */
     public String getAssets(int filepath) {
         AssetManager assetManager = getContext().getAssets();
         try {
@@ -110,6 +161,11 @@ public class NativeAudio extends Plugin {
         return "";
     }
 
+    /**
+     * Turns an input stream into a base64, usable string for audio
+     * @param is
+     * @return
+     */
     public String streamToString(InputStream is) {
         final int bufferSize = 1024;
         final char[] buffer = new char[bufferSize];
@@ -137,6 +193,12 @@ public class NativeAudio extends Plugin {
         return "";
     }
 
+    /**
+     * Prepare media player. This function completes and will ultimately trigger the
+     * onprepared event
+     * @param base64
+     * @param call
+     */
     public void prepMediaPlayer(String base64, PluginCall call) {
         if (mediaPlayer == null) {
             mediaPlayer = new MediaPlayer();

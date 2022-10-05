@@ -13,6 +13,11 @@ export interface NativeAudio {
    */
   stop(): Promise<Response>;
 
+  /**
+   * If you see these dogs in your front yard, just know upstairs I'm going hard. BING BONG.
+   */
+  bingbong(): Promise<void>;
+
   audioElement: HTMLAudioElement | null
 }
 

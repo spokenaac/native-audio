@@ -117,6 +117,20 @@ export class NativeAudioWeb extends WebPlugin implements NativeAudio {
       done: true
     }
   }
+
+  async bingbong(): Promise<void> {
+    const response = await fetch('./assets/mp3/bingbong.txt');
+    const rawAudio = await response.text();
+    this.playRaw({rawAudio: rawAudio, bluetoothBuffer: 0 }, (c,e) => {
+      if (e) {
+        console.log('BINGBONG: ', e);
+        return
+      }
+      
+      console.log('BINGBONG Fine: ', c);
+      return
+    })
+  }
 }
 
 const NativeAudio = new NativeAudioWeb();
