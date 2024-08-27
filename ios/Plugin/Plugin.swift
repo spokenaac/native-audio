@@ -24,7 +24,9 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
         // set sharedInstance to current one
         sharedInstance = AVAudioSession.sharedInstance()
         
-        try? sharedInstance.setCategory(.playback, mode: .default, options: [])
+        try? sharedInstance.setCategory(
+            .playback, mode: .default, options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers]
+        )
 
         // Keep call alive until the next
         call.keepAlive = true
@@ -66,6 +68,12 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
     public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         if let savedCall: CAPPluginCall = (bridge?.savedCall(withID: callID)) {
             savedCall.keepAlive = false
+
+            do {
+                try AVAudioSession.sharedInstance().setActive(false)
+            } catch let error as NSError {
+                print(error.localizedDescription)
+            }
 
             if flag {
                 savedCall.resolve(["ok": true, "done": true, "msg": "Finished playing audio."])
