@@ -24,6 +24,8 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
         // set sharedInstance to current one
         sharedInstance = AVAudioSession.sharedInstance()
         
+        try? sharedInstance.setActive(false)
+
         try? sharedInstance.setCategory(
             .playback, mode: .spokenAudio, options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers]
         )
