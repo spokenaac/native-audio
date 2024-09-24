@@ -25,8 +25,10 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
         sharedInstance = AVAudioSession.sharedInstance()
         
         try? sharedInstance.setCategory(
-            .playback, mode: .default, options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers]
+            .playback, mode: .spokenAudio, options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers]
         )
+
+        try? sharedInstance.setActive(true)
 
         // Keep call alive until the next
         call.keepAlive = true
@@ -35,8 +37,12 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
         let base64String = call.getString("rawAudio") ?? ""
         let audioData = Data(base64Encoded: base64String)
 
-        let bluetoothBuffer = call.getDouble("bluetoothBuffer") ?? 0
+        var bluetoothBuffer = call.getDouble("bluetoothBuffer") ?? 0
         let bluetoothKeepAlive = call.getDouble("bluetoothKeepAlive") ?? 0
+
+        if bluetoothBuffer < 100 {
+            bluetoothBuffer = 100
+        }
 
         if audioData != nil {
             let documentsDirectory = getDocumentsDirectory()
