@@ -42,9 +42,9 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
         var bluetoothBuffer = call.getDouble("bluetoothBuffer") ?? 0
         let bluetoothKeepAlive = call.getDouble("bluetoothKeepAlive") ?? 0
 
-        if bluetoothBuffer < 100 {
-            bluetoothBuffer = 100
-        }
+        // if bluetoothBuffer < 100 {
+        //     bluetoothBuffer = 100
+        // }
 
         if audioData != nil {
             let documentsDirectory = getDocumentsDirectory()
@@ -56,7 +56,12 @@ public class NativeAudio: CAPPlugin, AVAudioPlayerDelegate {
                     audioPlayer = try AVAudioPlayer(contentsOf: filename)
                     audioPlayer.delegate = self
                     audioPlayer.prepareToPlay()
-                    audioPlayer.play(atTime: audioPlayer.deviceCurrentTime + (bluetoothBuffer / 1000.0))
+
+                    if bluetoothBuffer == 0 {
+                        audioPlayer.play()
+                    } else {
+                        audioPlayer.play(atTime: audioPlayer.deviceCurrentTime + (bluetoothBuffer / 1000.0))
+                    }
 
                     call.resolve(["ok": true, "done": false, "msg": "Audio started"])
                 } catch let error {
