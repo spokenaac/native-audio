@@ -249,9 +249,13 @@ public class NativeAudio extends Plugin {
 
                     // reset our player
                     mp.reset();
-                    mediaPlayer = null;
+                    // mediaPlayer = null;
+
+                    System.out.println("SNA > player reset!");
 
                     if (currentlyPlayingBluetoothBuffer) {
+                        System.out.println("SNA > currently playing bluetooth buffer, preparing next audio...");
+
                         // bluetooth offset just completed
                         // prepare again but this time use the txt-to-speech base64
                         String txtToSpeechB64 = call.getString("rawAudio");
@@ -260,7 +264,7 @@ public class NativeAudio extends Plugin {
                         // flip the flag
                         currentlyPlayingBluetoothBuffer = false;
 
-                        res.put("msg", "Bluetooth offset finished, starting txt to speech...");
+                        res.put("msg", "SNA > Bluetooth offset finished, starting txt to speech...");
                         res.put("ok", true);
                         res.put("done", false);
                     }
@@ -268,7 +272,7 @@ public class NativeAudio extends Plugin {
                         // this is the last audio track we need to play
                         call.setKeepAlive(false);
 
-                        res.put("msg", "Audio finished playing");
+                        res.put("msg", "SNA > Audio finished playing");
                         res.put("ok", true);
                         res.put("done", true);
                     }
@@ -280,8 +284,8 @@ public class NativeAudio extends Plugin {
         }
         catch(Exception e){
             System.out.println("SNA > big oof!!");
-            System.out.println("\nException!!");
-            System.out.println(e.getMessage());
+            System.out.println("SNA > Exception!!");
+            System.out.println("SNA > " + e.getMessage());
             call.setKeepAlive(false);
             call.reject(e.getMessage());
             e.printStackTrace();
