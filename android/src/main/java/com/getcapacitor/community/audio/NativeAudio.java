@@ -249,7 +249,6 @@ public class NativeAudio extends Plugin {
 
                     // reset our player
                     mp.reset();
-                    // mediaPlayer = null;
 
                     System.out.println("SNA > player reset!");
 
@@ -269,6 +268,7 @@ public class NativeAudio extends Plugin {
                         res.put("done", false);
                     }
                     else {
+                        mediaPlayer = null;
                         // this is the last audio track we need to play
                         call.setKeepAlive(false);
 
