@@ -69,7 +69,7 @@ public class NativeAudio extends Plugin {
             // we're doing the bluetooth offset first, get it and not the txt-to-speech string
             currentlyPlayingBluetoothBuffer = true;
             Integer safeBluetoothBuffer = bluetoothBuffer - (bluetoothBuffer % 25);
-            base64String = getAssets(bluetoothBuffer);
+            base64String = getAssets(safeBluetoothBuffer);
         } else {
             // get the txt-to-speech base64 string
             base64String = call.getString("rawAudio");
