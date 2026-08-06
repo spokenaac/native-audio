@@ -123,13 +123,7 @@ public class NativeAudio extends Plugin {
                         System.out.println("SNA > audiofocus loss transient granted!");
                         synchronized(focusLock) {
                             // only resume if playback is being interrupted
-                            MediaPlayer player = mediaPlayer;
-                            try {
-                                resumeOnFocusGain = player != null && player.isPlaying();
-                            } catch (IllegalStateException ignored) {
-                                // The player may have been stopped or reset while focus was changing.
-                                resumeOnFocusGain = false;
-                            }
+                            resumeOnFocusGain = mediaPlayer.isPlaying();
                             playbackDelayed = false;
                         }
                         // stop(call);
