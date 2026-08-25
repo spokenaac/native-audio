@@ -61,7 +61,7 @@ public class NativeAudio extends Plugin {
         call.setKeepAlive(true);
 
         // get our offset
-        Integer bluetoothBuffer = call.getInt("bluetoothBuffer");
+        Integer bluetoothBuffer = call.getInt("bluetoothBuffer", 0);
 
         String base64String = "";
 
